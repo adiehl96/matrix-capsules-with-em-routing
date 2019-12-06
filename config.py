@@ -179,7 +179,8 @@ def load_or_save_hyperparams(train_dir=None):
 # FACTORIES FOR DATASET
 #------------------------------------------------------------------------------
 def get_dataset_path(dataset_name: str): 
-  options = {'smallNORB': 'data/smallNORB/tfrecord'}
+  options = {'smallNORB': 'data/smallNORB/tfrecord',
+             'faceset': 'data/faceset/tfrecord'}
   path = FLAGS.storage + options[dataset_name]
   return path
 
@@ -189,7 +190,8 @@ def get_dataset_size_train(dataset_name: str):
              'smallNORB': 23400 * 2,
              'fashion_mnist': 55000, 
              'cifar10': 50000, 
-             'cifar100': 50000}
+             'cifar100': 50000,
+             'faceset': 57575}
   return options[dataset_name]
 
 
@@ -198,12 +200,14 @@ def get_dataset_size_test(dataset_name: str):
              'smallNORB': 23400 * 2,
              'fashion_mnist': 10000, 
              'cifar10': 10000, 
-             'cifar100': 10000}
+             'cifar100': 10000,
+             'faceset': 10000}
   return options[dataset_name]
 
 
 def get_dataset_size_validate(dataset_name: str):
-  options = {'smallNORB': 23400 * 2}
+  options = {'smallNORB': 23400 * 2,
+             'faceset': 10000}
   return options[dataset_name]
 
 
@@ -212,11 +216,13 @@ def get_num_classes(dataset_name: str):
              'smallNORB': 5, 
              'fashion_mnist': 10, 
              'cifar10': 10, 
-             'cifar100': 100}
+             'cifar100': 100,
+             'faceset': 2}
   return options[dataset_name]
 
 
 import data_pipeline_norb as data_norb
+import data_pipeline_faceset as faceset
 def get_create_inputs(dataset_name: str, mode="train"):
   
   if mode == "train":
@@ -226,13 +232,14 @@ def get_create_inputs(dataset_name: str, mode="train"):
     
   path = get_dataset_path(dataset_name)
   
-  options = {'smallNORB': 
-         lambda: data_norb.create_inputs_norb(path, is_train)}
+  options = {'smallNORB': lambda: data_norb.create_inputs_norb(path, is_train),
+             'faceset': lambda: faceset.create_inputs_norb(path, is_train)}
   return options[dataset_name]
 
 
 import models as mod
 def get_dataset_architecture(dataset_name: str):
   options = {'smallNORB': mod.build_arch_smallnorb,
+             'faceset': mod.build_arch_smallnorb,
              'baseline': mod.build_arch_baseline}
   return options[dataset_name]
