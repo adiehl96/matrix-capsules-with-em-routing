@@ -1,2 +1,4 @@
 .idea
-data/smallNORB
+data/*
+logs
+__pycache__
