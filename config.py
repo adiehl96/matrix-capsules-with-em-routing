@@ -79,8 +79,17 @@ flags.DEFINE_string('storage', LOCAL_STORAGE,
 flags.DEFINE_string('db_name', 'capsules_ex1', 
                     'Name of the DB for mongo for sacred')
 
+#------------------------------------------------------------------------------
+# Experiment SETTINGS
+#------------------------------------------------------------------------------
+flags.DEFINE_integer('rotation', 0, 'Number of degrees the test set is rotated by')
+flags.DEFINE_boolean('mooney', False, 'Converts the test set to fake mooney faces')
+flags.DEFINE_boolean('flickr', False, 'Whether or not to use the flickr face set for testing')
+
 # Parse flags
 FLAGS = flags.FLAGS
+
+
 
 
 #------------------------------------------------------------------------------

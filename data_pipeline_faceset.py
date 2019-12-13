@@ -2,6 +2,13 @@ import numpy as np
 import os
 import pickle
 import tensorflow as tf
+import matplotlib.pyplot as plt
+from skimage.transform import rotate, resize
+from skimage import exposure
+import skimage.io as io
+
+
+
 from config import FLAGS
 
 
@@ -34,16 +41,35 @@ def load_facegreyreduxshuffled_set(batch_size, is_training=True):
 
         return trX, trY, num_tr_batch, valX, valY, num_val_batch
     else:
-        fd = open(os.path.join(path, 'facegreyreduxeval'), 'rb')
-        loaded = np.asarray(pickle.load(fd))
-        trainX = loaded.reshape((10000, 28, 28, 1)).astype(np.float32)
+        if (FLAGS.flickr):
+            fd = open(os.path.join(path, 'flickrsetgreyredux'), 'rb')
+            loaded = np.asarray(pickle.load(fd))
+            trainX = loaded.reshape((10000, 28, 28)).astype(np.float32) / 255.
+        else:
+            fd = open(os.path.join(path, 'facegreyreduxeval'), 'rb')
+            loaded = np.asarray(pickle.load(fd))
+            trainX = loaded.reshape((10000, 28, 28)).astype(np.float32) / 255.
 
         fd = open(os.path.join(path, 'facegreyreduxevalcat'), 'rb')
         loaded = np.asarray(pickle.load(fd))
         trainY = loaded.reshape((10000)).astype(np.int32)
 
-        num_te_batch = 10000 // batch_size
-        return trainX / 255., trainY, num_te_batch
+        rotatedlist = []
+        for image in trainX:
+            image = rotate(image, FLAGS.rotation, preserve_range=True)
+            if(FLAGS.mooney):
+                v_min, v_max = np.percentile(image, (49.99999999, 51))
+                image = exposure.rescale_intensity(image, in_range=(v_min, v_max))
+            rotatedlist.append(image)
+            if(len(rotatedlist)==1000):
+                I = resize(image.reshape(28, 28), (128, 128))
+                io.imsave("rotate" + str(FLAGS.rotation) +  "example.jpg", I, cmap='gray')
+        rotatedlist = np.asarray(rotatedlist)
+        plt.imshow(rotatedlist[33], cmap='gray')
+        plt.show()
+        trainX = rotatedlist.reshape((10000, 28, 28, 1)).astype(np.float32)
+
+        return trainX, trainY
 
 
 def create_inputs_norb(path, is_train: bool):
@@ -59,7 +85,7 @@ def create_inputs_norb(path, is_train: bool):
     if is_train:
         trX, trY, num_tr_batch, valX, valY, num_val_batch = load_facegreyreduxshuffled_set(FLAGS.batch_size, is_train)
     else:
-        trX, trY, num_tr_batch = load_facegreyreduxshuffled_set(FLAGS.batch_size, is_train)
+        trX, trY = load_facegreyreduxshuffled_set(FLAGS.batch_size, is_train)
 
     def generator():
         for e1, e2 in zip(trX, trY):
