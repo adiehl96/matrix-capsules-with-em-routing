@@ -26,6 +26,7 @@ import utils as utl
 import daiquiri
 logger = daiquiri.getLogger(__name__)
 
+os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 def main(args):
   """Run training and validation.

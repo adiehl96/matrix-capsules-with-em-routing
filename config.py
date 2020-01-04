@@ -200,7 +200,7 @@ def get_dataset_size_train(dataset_name: str):
              'fashion_mnist': 55000, 
              'cifar10': 50000, 
              'cifar100': 50000,
-             'faceset': 57575}
+             'faceset': 50000}
   return options[dataset_name]
 
 
@@ -216,7 +216,7 @@ def get_dataset_size_test(dataset_name: str):
 
 def get_dataset_size_validate(dataset_name: str):
   options = {'smallNORB': 23400 * 2,
-             'faceset': 10000}
+             'faceset': 15000}
   return options[dataset_name]
 
 
